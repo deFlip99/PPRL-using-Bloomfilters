@@ -1,0 +1,64 @@
+/* Hauptfenster */
+QMainWindow {
+    background-color: #f0f0f0; 
+    color: #333333;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+QMainWindow QLabel{
+    color: #000000;
+}
+
+/* Sidebar (QListWidget) */
+QListWidget {
+    background-color: #e0e0e0;
+    border: 1px solid #cccccc; 
+    color: #333333; 
+    font-size: 14px;
+}
+
+QListWidget::item {
+    padding: 10px; 
+}
+
+QListWidget::item:selected {
+    background-color: #cccccc;
+    color: #000000;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #4CAF50;
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 8px 16px; 
+    border: 1px solid #388E3C;
+}
+
+QPushButton:hover {
+    background-color: #45A049;
+}
+
+QPushButton:pressed {
+    background-color: #388E3C;
+}
+
+/* TabWidget */
+QTabWidget::pane {
+    background-color: #ffffff;
+    border: 1px solid #cccccc; 
+}
+
+QTabBar::tab {
+    background-color: #e0e0e0;
+    border: 1px solid #cccccc;
+    padding: 5px 10px;
+    margin: 2px;
+    color: #000000;
+}
+
+QTabBar::tab:selected {
+    background-color: #ffffff; 
+    border: 1px solid #333333; 
+}

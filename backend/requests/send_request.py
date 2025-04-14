@@ -1,0 +1,9 @@
+import pika, json
+
+def send_request(host: str, queue_name:str, message:str):
+    try:
+        ...
+    except Exception as e:
+        ...
+    finally:
+        ...

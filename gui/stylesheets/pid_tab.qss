@@ -1,0 +1,69 @@
+/* PIDTab: Hintergrund */
+QWidget {
+    background-color: #f4f4f4; /* Heller Hintergrund */
+    color: #444444; /* Dunklerer Text */
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+/* Dropdown (QComboBox) */
+QComboBox {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 13px;
+}
+
+QComboBox::drop-down {
+    border-left: 1px solid #cccccc;
+    width: 20px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+}
+
+/* Tabelle (QTableWidget) */
+QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    gridline-color: #dddddd;
+    font-size: 13px;
+}
+
+QHeaderView::section {
+    background-color: #d9d9d9; /* Hellgrauer Hintergrund */
+    color: #444444; /* Textfarbe */
+    padding: 5px;
+    border: 1px solid #cccccc;
+    font-weight: bold;
+}
+
+/* Checkbox */
+QCheckBox {
+    spacing: 5px;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #1976D2; /* Blaue Buttons */
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 8px 12px;
+    border: 1px solid #1565C0;
+}
+
+QPushButton:hover {
+    background-color: #1565C0;
+}
+
+QPushButton:pressed {
+    background-color: #0D47A1;
+}
