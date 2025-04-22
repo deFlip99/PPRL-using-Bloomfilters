@@ -1,9 +1,29 @@
 from bitarray import bitarray
 import mmh3, random, math
 from backend.data import normalize_date, normalize_string, gen_qgram
+from config import GLOBAL_VAL, BLOOMFILTER_SETTINGS
 
-#create BloomFilter
-def get_bloomfilter(text, hash_runs:int, hash_seeds:list[int], array_size:int, qSize: int , padding:bool, normMode:str, toUpper:bool=True) -> bitarray:
+
+def get_bloomfilter(text:str , hash_runs:int,
+                    hash_seeds:list[int],
+                    array_size:int,                   
+                    normMode:str,
+                    padding:bool = BLOOMFILTER_SETTINGS.PADDING,
+                    qSize: int = BLOOMFILTER_SETTINGS.QSIZE) -> bitarray:
+    '''
+    Function generating the bloomfilter.
+
+    Parameters:
+        text (str):                         Any string, which will be fed into the bloomfilter
+        hash_sees (list[int]):              List of Seeds, which will be used in the implemented hash-function
+        array_size (int):                   Amount of bits in the bloomfilter
+        normMode (str = "date" | "word"):   Determines if we use the normalization for words or dates
+        padding (bool):                     true = Tom -> _Tom_ , false Tom -> Tom
+        qSize (int):                        Size of the generated q-grams; qSize = 2 -> Tom = ["To", "om"]
+
+    Returns:
+        bitarray:                           Bloomfilter 
+    '''
     if normMode == "date": text = [normalize_date(text)]
     elif normMode == "word":
         text = text.split()
@@ -26,15 +46,34 @@ def get_bloomfilter(text, hash_runs:int, hash_seeds:list[int], array_size:int, q
     return bloom_filter
 
 
-def bf_convert_blob_to_bf(blob) -> bitarray:
+def bf_convert_bytes_to_01(bf_in_bytes) -> str:
+    '''
+    Function converting the bytes representation of a bloomfilter into zeros and ones.
+    
+    Parameters:
+        bf_in_bytes (BytesLike):    Byte representation of a bloomfilter
+
+    Returns:
+        str:                        Zero One representation of a bloomfilter
+    '''
     temp = bitarray()
-    temp.frombytes(blob)
+    temp.frombytes(bf_in_bytes)
     return temp.to01()
 
 
-#Füge beliebigem bitarray einen random oder fixen Salt hinzu
-def bf_add_salt(bf:bitarray, salt_amount: int = 0, salt_fix: list[int] = None):
 
+def bf_add_salt(bf:bitarray, salt_amount: int = 0, salt_fix: list[int] = None):
+    '''
+    Function used to add 'Salts' (fix or random) to an already existing bloomfilter/bitarray.
+
+    Parameters:
+        bf (bitarray):                      The Bloomfilter in which you want to add Salts
+        salt_amount (int) (optional):       Adds a given amount of Salts random to the Bloomfilter; default = 0
+        salt_fixed (list[int]) (optional):  List of Indices where Salts will be added; will be prefered over salt_amount
+
+    Returns:
+        bitarray:                           Bloomfilter with Salts
+    '''
     bf_c = bf.copy()
 
     if salt_fix:
@@ -48,9 +87,20 @@ def bf_add_salt(bf:bitarray, salt_amount: int = 0, salt_fix: list[int] = None):
     return bf_c
 
 
-#Similarity with Sorenson-Dice
+
 def bf_sorenson_dice(bitarrayA: bitarray, bitarrayB: bitarray) -> float:
+    '''
+    Similarity function, calculating the similarity of two bitarrays of the same size, based on the Sorenson-Dice principle
+
+    Parameters:
+        bitarrayA (bitarray):       first bitarray
+        bitarrayB (bitarray):       second bitarray
+    Returns:
+        float:                      Similarity of bitarrayA & bitarrayB
+    '''
     if len(bitarrayA) != len(bitarrayB): raise ValueError(f"Bitarrays sind nicht gleich lang\n Array A: {len(bitarrayA)}, Array B: {len(bitarrayB)}")
+    if not isinstance(bitarrayA, bitarray) or not isinstance(bitarrayB, bitarray):
+        raise TypeError("bf_sorenson_dice: both bitarrays need to be the same size")
 
     intersection = (bitarrayA & bitarrayB).count(1)
 
@@ -63,6 +113,19 @@ def bf_sorenson_dice(bitarrayA: bitarray, bitarrayB: bitarray) -> float:
 
 
 def bf_get_rating(thresholds: list[float], similarity: float) -> str:
+    '''
+    Helper function which is used to give the similarity a rating
+
+    Parameters:
+        threshold (list[float]):    List of thresholds which the rating will be based on
+        similarity (float):         Similarity which will be rated
+    
+    Returns:
+        str:                        rating -> ["strong", "medium", "weak", "not alike"]
+    '''
+    if len(thresholds) != 3: raise SyntaxError("bf_get_rating: threshold needs to be a list of 3 floats")
+    if not all(0 < value <= 1.0 for value in thresholds): raise ValueError("bf_get_rating: threshold must contain values between 0 and 1")
+
     if similarity > thresholds[0]:
         return "strong"
     elif thresholds[0] > similarity >= thresholds[1]:
@@ -78,20 +141,32 @@ def bf_extended_similarity(bf1: bitarray,
                            array_sizes: list[int],
                            array_names: list[str],
                            out_mode: str = None,
-                           thresholds: list[float] = None,
+                           thresholds: list[float] = GLOBAL_VAL.RECORD_LINKAGE_TH,
                            swap: bool = False):
-    """
-    out_mode: 
-    Für "total" werden alle Ähnlichkeiten Zusammengerechnet. return = [similarity, "total", rating], SwapedBool
-    Für None werden die Ähnlichkeiten seperat ausgegeben. return = [(similarity, "vorname", rating),...], SwapedBool
-    """
+    '''
+    Extended function used for a more detailed comparison of two bloomfilters
+
+    Parameters:
+        bf1 (bitarray):             Bloomfilter which will be compared to
+        bf2 (bitarray):             Bloomfilter we want to compare to others
+        array_sizes (list[int]):    List of the segment sizes on the bloomfilter;
+                                    e.g.: 100 (first_name), 50 (last_name) ->   first 100 bits corespond to the first_name
+                                                                                next 50 bits corespond to the last_name
+        array_names (list[str]):    Actual list of names coresponding to different segments on the Bloomfilter;
+                                    see first_name, last_name in array_sizes
+        out_mode (str):             out_mode = "total", returns the extended similarity for the whole Bloomfilter
+                                    out_mode != "total", returns the extended similarity for each segment on the Bloomfilter
+        thresholds (list[float]):   List of thresholds used for the similarity rating
+        swap (bool) (optional):     If True this function will automatically swap the first and last name if it suspects a swap
+
+    Returns:
+        list[float, str, str], bool | list[tuple[float, str, str]], bool
+        
+    '''
     swaped = False
 
-    # Default-Parameter initialisieren
-    if thresholds is None:
-        thresholds = [0.95, 0.87, 0.6]
-    else:
-        assert len(thresholds) == 3, "Die Liste an thresholds muss genau 3 Werte enthalten"
+
+    assert len(thresholds) == 3, "bf_extended_similarity: thresholds needs to be a list of 3 floats"
     thresholds = sorted(thresholds, reverse=True)
 
     bf1_dict = {}
@@ -118,7 +193,7 @@ def bf_extended_similarity(bf1: bitarray,
 
     if len(ratings) >= 4:
         # Überprüft, ob der Vorname von bf1 nicht ähnlich zum Nachnamen von bf2 ist.
-        if ratings[0] == ratings[1] == "not alike":
+        if ratings[0] in ["weak", "not alike"] and ratings[1] in ["weak", "not alike"]:
             if not (ratings[2] == ratings[3] == "not alike"):
                 new1 = bf_sorenson_dice(bf1_dict[array_names[0]], bf2_dict[array_names[1]])
                 new2 = bf_sorenson_dice(bf1_dict[array_names[1]], bf2_dict[array_names[0]])

@@ -25,7 +25,7 @@ QComboBox QAbstractItemView {
     border: 1px solid #cccccc;
 }
 
-/* Tabelle (QTableWidget) */
+/* Tabelle*/
 QTableWidget {
     background-color: #ffffff;
     border: 1px solid #cccccc;
@@ -34,8 +34,8 @@ QTableWidget {
 }
 
 QHeaderView::section {
-    background-color: #d9d9d9; /* Hellgrauer Hintergrund */
-    color: #444444; /* Textfarbe */
+    background-color: #d9d9d9;
+    color: #444444;
     padding: 5px;
     border: 1px solid #cccccc;
     font-weight: bold;
@@ -52,8 +52,9 @@ QCheckBox::indicator {
 }
 
 /* Buttons */
+/* Standard-Buttons */
 QPushButton {
-    background-color: #1976D2; /* Blaue Buttons */
+    background-color: #1976D2; 
     color: #ffffff;
     border-radius: 5px;
     padding: 8px 12px;
@@ -66,4 +67,39 @@ QPushButton:hover {
 
 QPushButton:pressed {
     background-color: #0D47A1;
+}
+
+/* Delete-Table-Button */
+QPushButton#deleteTableButton {
+    background-color: #D32F2F; 
+    border: 1px solid #B71C1C;
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 8px 12px;
+}
+
+QPushButton#deleteTableButton:hover {
+    background-color: #ac2525;
+}
+
+QPushButton#deleteTableButton:pressed {
+    background-color: #a52121;
+}
+
+
+/* Clear-Table-Button */
+QPushButton#clearTableButton {
+    background-color: #ffbb9a15; 
+    border: 1px solid #ffae8f14;
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 8px 12px;
+}
+
+QPushButton#clearTableButton:hover {
+    background-color: #ffa68813;
+}
+
+QPushButton#clearTableButton:pressed {
+    background-color: #ffa38614;
 }

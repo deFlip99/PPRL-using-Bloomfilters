@@ -62,8 +62,9 @@ QCheckBox::indicator:checked {
 }
 
 /* Buttons */
+/* Standard-Buttons */
 QPushButton {
-    background-color: #1976D2; /* Blaue Buttons */
+    background-color: #1976D2; 
     color: #ffffff;
     border-radius: 5px;
     padding: 8px 12px;
@@ -76,4 +77,38 @@ QPushButton:hover {
 
 QPushButton:pressed {
     background-color: #0D47A1;
+}
+
+/* Delete-Button */
+QPushButton#removeButton {
+    background-color: #D32F2F; 
+    border: 1px solid #B71C1C;
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 8px 12px;
+}
+
+QPushButton#removeButton:hover {
+    background-color: #ac2525;
+}
+
+QPushButton#removeButton:pressed {
+    background-color: #a52121;
+}
+
+/* Import-Button */
+QPushButton#importFileButton {
+    background-color: #ffbb9a15; 
+    border: 1px solid #ffae8f14;
+    color: #ffffff;
+    border-radius: 5px;
+    padding: 8px 12px;
+}
+
+QPushButton#importFileButton:hover {
+    background-color: #ffa68813;
+}
+
+QPushButton#importFileButton:pressed {
+    background-color: #ffa38614;
 }

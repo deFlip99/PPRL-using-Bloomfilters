@@ -1,5 +1,4 @@
 from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel, QLineEdit, QPushButton, QHBoxLayout
-from PyQt6.QtCore import Qt
 
 
 class AddTableDialog(QDialog):
