@@ -15,7 +15,6 @@ class BLOOMFILTER_SETTINGS:
 
     ARRAY_SIZES                 = {  'name'         :  800,
                                     'other'       :   208}
-    THRESHOLD                   =   [..., ..., ...]
 
 
     HASHRUNS_NAME               =   40  

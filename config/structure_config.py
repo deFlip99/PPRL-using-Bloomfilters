@@ -20,8 +20,8 @@ class PATHS:
     EXPORT_TESTFILE_PATH        = os.path.join(EXPORT_DIR, "export_placeholder.txt")
 
     #gui
-    GUI_DIR              = os.path.join(BASE_DIR, "gui")
-    STYLESHEETS_DIR       = os.path.join(GUI_DIR, "stylesheets")
+    GUI_DIR                     = os.path.join(BASE_DIR, "gui")
+    STYLESHEETS_DIR             = os.path.join(GUI_DIR, "stylesheets")
 
 
 

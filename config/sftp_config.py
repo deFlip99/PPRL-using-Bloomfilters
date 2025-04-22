@@ -1,6 +1,0 @@
-#SFTP SETTINGS
-class SFTP_SETTINGS:
-    
-    REMOTE_FILE_PATH            = ...
-    HOST                        = ...
-    PORT                        = 22
