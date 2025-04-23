@@ -125,43 +125,6 @@ def db_delete_pid_table(table_name: str,
         conn_pid.close()
 
 
-def db_clear_pid_table(table_name: str,
-                       pid_db_path: str = PATHS.DATABASE_PATH_PID) -> None:
-    """
-    Delete all rows from the specified PID table and perform a VACUUM to reclaim space.
-
-    Parameters:
-        table_name (str):       Suffix of the PID table to clear (without the prefix).
-        pid_db_path (str):      Filesystem path to the PID SQLite database.
-
-    Returns:
-        None
-    """
-    full_name = GLOBAL_VAL.PID_TABLE_PREFIX + table_name
-
-    try:
-        with sqlite3.connect(pid_db_path) as conn:
-            cursor = conn.cursor()
-
-            # Check if the table exists
-            cursor.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-                (full_name,)
-            )
-            if not cursor.fetchone():
-                print(f"Table '{full_name}' does not exist.")
-                return
-
-            # Delete all rows
-            cursor.execute(f'DELETE FROM "{full_name}"')
-
-            # Reclaim space
-            cursor.execute("VACUUM")
-            conn.commit()
-
-    except sqlite3.Error as e:
-        print(f"Error clearing table '{full_name}': {e}")
-
 
 def db_insert_patient(
     first_name: str,
@@ -413,11 +376,10 @@ def db_insert_patient_record_helper(row,
                                     patient_table:str = "Patientendaten"
                                     ):
     fname, lname, dob, gender, mdat = row
-    dob_norm = normalize_date(dob)
     bf_list = [
         get_bloomfilter(fname, BLOOMFILTER_SETTINGS.HASHRUNS_NAME, BLOOMFILTER_SETTINGS.HASH_SEEDS40, BLOOMFILTER_SETTINGS.ARRAY_SIZES['name'], 'word'),
         get_bloomfilter(lname, BLOOMFILTER_SETTINGS.HASHRUNS_NAME, BLOOMFILTER_SETTINGS.HASH_SEEDS40, BLOOMFILTER_SETTINGS.ARRAY_SIZES['name'], 'word'),
-        get_bloomfilter(dob_norm, BLOOMFILTER_SETTINGS.HASHRUNS_OTHER, BLOOMFILTER_SETTINGS.HASH_SEEDS20, BLOOMFILTER_SETTINGS.ARRAY_SIZES['other'], 'date'),
+        get_bloomfilter(dob, BLOOMFILTER_SETTINGS.HASHRUNS_OTHER, BLOOMFILTER_SETTINGS.HASH_SEEDS20, BLOOMFILTER_SETTINGS.ARRAY_SIZES['other'], 'date'),
         get_bloomfilter(gender, BLOOMFILTER_SETTINGS.HASHRUNS_OTHER, BLOOMFILTER_SETTINGS.HASH_SEEDS20, BLOOMFILTER_SETTINGS.ARRAY_SIZES['other'], 'word'),
     ]
     bf = bitarray()
@@ -425,7 +387,7 @@ def db_insert_patient_record_helper(row,
         bf.extend(b)
     sql_cursor.execute(
         f"INSERT INTO {patient_table} (first_name, last_name, date_of_birth, gender, mdat, BF) VALUES (?, ?, ?, ?, ?, ?)",
-        (fname, lname, dob_norm, gender, mdat or None, bf.tobytes())
+        (fname, lname, dob, gender, mdat or None, bf.tobytes())
     )
 
 
@@ -617,13 +579,12 @@ def db_lookup_name(
         quoted_cols.append(f'"{col}"')
     columns_str = ", ".join(quoted_cols)
 
-    # Build parameter placeholders
-    placeholders = ", ".join(["(?, ?)" for _ in names])
+
     params = [item for name in names for item in name]
 
     query = (f'''
             SELECT {columns_str} FROM "{patient_table}" 
-            WHERE (first_name, last_name) IN ({placeholders})
+            WHERE (first_name, last_name) IN ({", ".join(["(?, ?)" for _ in names])})
         '''
     )
 
