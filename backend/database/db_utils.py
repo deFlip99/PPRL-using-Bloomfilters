@@ -226,7 +226,7 @@ def db_delete_patient(
     if not patient_table.isidentifier():
         raise ValueError(f"Invalid table name: {patient_table!r}")
 
-    query = f'DELETE FROM "{patient_table}" WHERE patienten_id IN ({",".join("?" for _ in ids)})'
+    query = f'DELETE FROM "{patient_table}" WHERE patient_id IN ({",".join("?" for _ in ids)})'
 
     try:
         with sqlite3.connect(patient_db_path) as conn:
@@ -633,7 +633,7 @@ def db_lookup_id(
 
     query = (
         f'SELECT {columns_str} FROM "{patient_table}" '
-        f'WHERE patienten_id IN ({", ".join(["?"] * len(ids))})'
+        f'WHERE patient_id IN ({", ".join(["?"] * len(ids))})'
     )
 
     try:
@@ -719,7 +719,7 @@ def db_extended_relink_bf(
     try:
         with sqlite3.connect(patient_db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute(f'SELECT patienten_id, BF FROM "{patient_table}"')
+            cursor.execute(f'SELECT patient_id, BF FROM "{patient_table}"')
             rows = cursor.fetchall()
 
         for patient_id, bf_blob in rows:

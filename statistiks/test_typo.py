@@ -1,3 +1,8 @@
+#########################################################################
+#       Die Datei müsste nochmal auf Korrektheit überprüft werden,      #
+#       aber in der Theorie sollte sie noch richtig arbeiten            #
+#########################################################################
+
 import os, sys,csv, random
 from statistics import mean, median
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

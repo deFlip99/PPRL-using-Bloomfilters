@@ -131,7 +131,7 @@ class PatientenTab(QWidget):
         self.table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
-        main_layout.addWidget(self.table, 3, 0, 1, 5)
+        main_layout.addWidget(self.table, 3, 0, 1, 6)
         self.setLayout(main_layout)
 
         # Data: initialize

@@ -58,7 +58,7 @@ QCheckBox::indicator:checked {
     border: 1px solid #000000;
     background-color: #aeadad;
     border-radius: 4px;
-    image: url("stylesheets/images/check.png"); 
+    image: url("gui/stylesheets/images/check.png"); 
 }
 
 /* Buttons */

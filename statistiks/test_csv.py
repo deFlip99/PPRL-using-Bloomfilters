@@ -1,6 +1,7 @@
 import csv, random, string, os
 from test_settings import FEHLERANZAHL
 
+#Funltion um eine bestimmte anzahl an Schreibfehlern in ein Wort einzubauen
 def introduce_errors(data, num_errors):
     data_list = list(data)
     indices = [i for i in range(len(data_list)) if data_list[i] != ',']
