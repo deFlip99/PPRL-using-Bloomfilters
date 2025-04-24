@@ -43,6 +43,13 @@ class PIDTab(QWidget):
         self.setupUI()
         self.load_pid_table_names()
 
+
+    def setup_pat_signal(self, pat_tab):
+        # Signal PIDTab
+        self.pat_tab = pat_tab
+        self.pat_tab.pat_tables_updated.connect(self.load_data)
+
+
     def setupUI(self):
 
         main_layout = QGridLayout(self)
@@ -101,9 +108,9 @@ class PIDTab(QWidget):
         else:
             self.table.setRowCount(0)
 
-    def load_data(self, table_name):
+    def load_data(self, table_name = None):
         if not table_name:
-            return
+            table_name = self.dropdown.currentText()
 
         full_table_name = GLOBAL_VAL.PID_TABLE_PREFIX + table_name
         query = f"SELECT mdat, BFS FROM {full_table_name}"

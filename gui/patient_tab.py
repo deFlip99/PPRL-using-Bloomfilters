@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import (
     QWidget, QGridLayout, QTableWidget, QTableWidgetItem, QComboBox, QFileDialog,
     QHeaderView, QCheckBox, QPlainTextEdit, QSizePolicy, QAbstractItemView
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFontMetrics
 
 from config import PATHS
@@ -28,15 +28,20 @@ from backend.database import (
 
 
 class PatientenTab(QWidget):
-    def __init__(self, pid_tab):
+
+    pat_tables_updated = pyqtSignal()
+
+    def __init__(self):
         super().__init__()
-        self.pid_tab = pid_tab
         self.header_all_checked = False
 
         self.setupUI()
         self.setStyleSheet(load_stylesheet("patient_tab.qss"))
 
+
+    def setup_pid_signal(self, pid_tab):
         # Signal PIDTab
+        self.pid_tab = pid_tab
         self.pid_tab.pid_tables_updated.connect(self.load_pid_table_names)
 
     def setupUI(self):
@@ -270,6 +275,7 @@ class PatientenTab(QWidget):
         try:
             db_delete_patient(patient_ids_to_delete)
             self.load_data()
+
         except Exception as e:
             print(f"Fehler beim Löschen von Patienten: {e}")
 
@@ -298,6 +304,7 @@ class PatientenTab(QWidget):
 
         try:
             db_export_patient_into_pid(selected_patients, pid_table_name)
+            self.pat_tables_updated.emit()
         except Exception as e:
             print(f"Fehler beim Export in die PID-Tabelle '{pid_table_name}': {e}")
 

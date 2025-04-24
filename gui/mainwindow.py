@@ -79,7 +79,9 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(page)
         self.tabWidget = QTabWidget()
         self.pidTab = PIDTab()
-        self.patientenTab = PatientenTab(self.pidTab)
+        self.patientenTab = PatientenTab()
+        self.pidTab.setup_pat_signal(self.patientenTab)
+        self.patientenTab.setup_pid_signal(self.pidTab)
         self.tabWidget.addTab(self.patientenTab, "PatientenDB")
         self.tabWidget.addTab(self.pidTab, "pidDB")
 
